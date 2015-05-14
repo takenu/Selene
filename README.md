@@ -9,3 +9,8 @@ This fork is intended solely for use as a header library for Chathran
 repositories. Copyright resides with the original author. Please refer
 to LICENSE for the terms under which Selene is available.
 
+## Usage
+
+Include as '#include <selene.h>'. Include before including Lua itself,
+especially when using Lua 5.3, since in that case we need to enable a
+compatibility mode for handling unsigned ints.
