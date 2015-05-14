@@ -1,3 +1,26 @@
+/* This file is part of Selene. It is licensed under the zlib license as follows:
+
+Copyright (c) 2013 Jeremy Ong
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+claim that you wrote the original software. If you use this software
+in a product, an acknowledgment in the product documentation would be
+appreciated but is not required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+misrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source
+distribution. */
+
 #pragma once
 
 #include <string>
@@ -78,24 +101,24 @@ inline std::string _get(_id<std::string>, lua_State *l, const int index) {
 template <typename T>
 inline T* _check_get(_id<T*>, lua_State *l, const int index) {
     return (T *)lua_topointer(l, index);
-};
+}
 
 template <typename T>
 inline T& _check_get(_id<T&>, lua_State *l, const int index) {
     static_assert(!is_primitive<T>::value,
                   "Reference types must not be primitives.");
     return *(T *)lua_topointer(l, index);
-};
+}
 
 template <typename T>
 inline T _check_get(_id<T&&>, lua_State *l, const int index) {
     return _check_get(_id<T>{}, l, index);
-};
+}
 
 
 inline int _check_get(_id<int>, lua_State *l, const int index) {
     return luaL_checkint(l, index);
-};
+}
 
 inline unsigned int _check_get(_id<unsigned int>, lua_State *l, const int index) {
 #if LUA_VERSION_NUM >= 502
@@ -103,6 +126,11 @@ inline unsigned int _check_get(_id<unsigned int>, lua_State *l, const int index)
 #else
     return static_cast<unsigned>(luaL_checkint(l, index));
 #endif
+}
+
+/* Takenu-added. */
+inline double _check_get(_id<float>, lua_State *l, const int index) {
+    return (float)luaL_checknumber(l, index);
 }
 
 inline lua_Number _check_get(_id<lua_Number>, lua_State *l, const int index) {
@@ -214,7 +242,7 @@ T _pop(_id<T> t, lua_State *l) {
 
 /* Setters */
 
-inline void _push(lua_State *l) {}
+inline void _push(lua_State *) {}
 
 template <typename T>
 inline void _push(lua_State *l, MetatableRegistry &m, T* t) {
@@ -330,7 +358,7 @@ inline void _push_dispatcher(lua_State *l,
     _push_n(l, m, std::get<N>(values)...);
 }
 
-inline void _push(lua_State *l, MetatableRegistry &, std::tuple<>) {}
+inline void _push(lua_State *, MetatableRegistry &, std::tuple<>) {}
 
 template <typename... T>
 inline void _push(lua_State *l, MetatableRegistry &m, const std::tuple<T...> &values) {
@@ -354,7 +382,7 @@ inline void _push_dispatcher(lua_State *l,
     _push_n(l, std::get<N>(values)...);
 }
 
-inline void _push(lua_State *l, std::tuple<>) {}
+inline void _push(lua_State *, std::tuple<>) {}
 
 template <typename... T>
 inline void _push(lua_State *l, const std::tuple<T...> &values) {
