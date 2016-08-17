@@ -44,6 +44,7 @@ template <typename Ret, typename... Args, std::size_t... N>
 inline Ret _lift(std::function<Ret(Args...)> fun,
                  std::tuple<Args...> args,
                  _indices<N...>) {
+	(void)args;
     return fun(std::get<N>(args)...);
 }
 
@@ -56,6 +57,7 @@ inline Ret _lift(std::function<Ret(Args...)> fun,
 
 template <typename... T, std::size_t... N>
 inline std::tuple<T...> _get_args(lua_State *state, _indices<N...>) {
+	(void)state;
     return std::tuple<T...>{_check_get(_id<T>{}, state, N + 1)...};
 }
 
